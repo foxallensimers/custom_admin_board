@@ -1,6 +1,7 @@
 // Protractor configuration file, see link for more information
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 //custom  theme nav bar
+//update theme login page and chart analyze page
 
 
 const { SpecReporter } = require('jasmine-spec-reporter');
