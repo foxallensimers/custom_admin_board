@@ -1,0 +1,363 @@
+<!-- Main view/routes wrapper-->
+<div id="warning" class="modal fade" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Warning</h4>
+      </div>
+      <div class="modal-body">
+        You use the trial version. For activation this function You have to subscribe.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" href="#/preferences/subscription" onclick="$('#warning').modal('toggle');">Go to subscription</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+  <div class="col-lg-10">
+    <h2>Orders list</h2>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#/dashboards/main-view">Home</a>
+      </li>
+      <li class="active">
+        <strong>Orders list</strong>
+      </li>
+    </ol>
+  </div>
+  <div class="col-lg-2">
+    <div class="text-center" style="float: right;margin-top: 30px;">
+      <a data-toggle="modal" class="btn btn-primary" [href]="dsblCtrlBtns?'#warning':'#create-form'" (click)="onCreateDialogShow()">Create order</a>
+    </div>
+  </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight ecommerce">
+  <!--create order dialog-->
+  <div id="create-form" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Create order</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-edit" #createOrderForm="ngForm">
+            <!--tabs header-->
+            <ul class="nav nav-tabs">
+              <li class="active"><a data-toggle="tab" href="#crordtabmain">Main</a></li>
+              <li><a data-toggle="tab" href="#crordtabpay">Payment</a></li>
+              <li><a data-toggle="tab" href="#crordtabstatus">Status</a></li>
+            </ul>
+            <!--end tabs header-->
+            <!--tabs content-->
+            <div class="tab-content">
+              <div id="crordtabmain" class="tab-pane fade in active">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="clientName">Client Name</label>
+                      <select required [(ngModel)]="createOrderModel.clientName" name="clientName" id="clientName" class="form-control" #name="ngModel"
+                        placeholder="Client Name">
+                              <option *ngFor="let client of clients | async" value="{{client.name}}">{{client.name}}</option>
+                              </select>
+                      <!--validation name block-->
+                      <div *ngIf="name.errors && (name.dirty || name.touched)" class="alert alert-danger">
+                        <div [hidden]="!name.errors.required">
+                          Client name is required
+                        </div>
+                        <div [hidden]="!name.errors.pattern">
+                          Name must contain leters and numbers only.
+                        </div>
+                      </div>
+                      <!--end validation namr block-->
+                    </div>
+                  </div>
+                  <!--start shoping cart-->
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="products">Products</label>
+                      <select id="products1" name="products" class="form-control" [(ngModel)]="slctdPrdcts" (change)="createOrderModel.moveToShopCart($event.target.options.selectedIndex);slctdPrdcts=[]"
+                        placeholder="Product">
+                            <option data="i" *ngFor="let product of createOrderModel.availableProducts;let i=index" value="{{product.name}}">{{product.name}}</option>
+                    </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <table class="table table-stripped toggle-arrow-tiny">
+                        <tbody>
+                          <tr *ngFor="let item of createOrderModel.shopCart; let i=index">
+                            <td>
+                              {{item.name}}
+                            </td>
+                            <td>
+                              {{item.price | currency:'USD':true}}
+                            </td>
+                            <td>
+                              <input *ngIf="!item.isService" type="number" min="1" max="{{item.quantity}}" [(ngModel)]="createOrderModel.shopCart[i].bayQt"
+                                (change)="createOrderModel.recalcOrderSum()" name="qt{{i}}" />
+                            </td>
+                            <td>
+                              {{createOrderModel.shopCart[i].bayQt * item.price | currency:'USD':true}}
+                            </td>
+                            <td class="text-right">
+                              <button type="button" (click)="createOrderModel.moveToAvail(i);" class="btn btn-danger">Delete</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="4">
+                              <h4> Total: </h4>
+                            </td>
+                            <td class="text-right">
+                              <h4> {{createOrderModel.orderSum | currency:'USD':true }} </h4>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                  <!--end shoping cart-->
+                </div>
+              </div>
+              <div id="crordtabpay" class="tab-pane fade">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="paid">Price paid/unpaid</label>
+                      <select [(ngModel)]="createOrderModel.paid" name="paid" id="paid" class="form-control" placeholder="Price paid/unpaid">
+                              <option value="paid" >paid</option>
+                              <option value="unpaid" selected>unpaid</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="crordtabstatus" class="tab-pane fade">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="status">Status</label>
+                      <select [(ngModel)]="createOrderModel.status" name="status" id="status" class="form-control" placeholder="Status" value="Pending">
+                        <option value="pending" selected>Pending</option>
+                        <option value="done">Done</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end tabs content-->
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <button type="button" (click)="onCreate(createOrderForm)" class="btn btn-success" [disabled]="invalidProducts || createOrderForm.invalid">Save</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--end create dialog-->
+  <!-- Edit order dialog-->
+  <div id="edit-form" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit order</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-edit" #updateOrderForm="ngForm">
+            <div class="row">
+              <!-- Tabs header-->
+              <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#e-ordr-main">Main</a></li>
+                <li><a data-toggle="tab" href="#e-ordr-pay">Payment</a></li>
+                <li><a data-toggle="tab" href="#e-ordr-status">Status</a></li>
+              </ul>
+              <!-- Tabs content-->
+              <div class="tab-content">
+                <div id="e-ordr-main" class="tab-pane fade in active">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="ename">Client Name</label>
+                      <input id="ename" disabled [(ngModel)]="editOrderModel.clientName" name="clientName2" type="text" class="form-control" placeholder="Client Name">
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="products">Products</label>
+                      <select id="products1" name="products" class="form-control" [(ngModel)]="slctdPrdcts" (change)="editOrderModel.moveToShopCart($event.target.options.selectedIndex);slctdPrdcts=[]"
+                        placeholder="Product">
+                          <option data="i" *ngFor="let product of editOrderModel.availableProducts;let i=index" value="{{product.name}}">{{product.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <table class="table table-stripped toggle-arrow-tiny" data-page-size="15">
+                        <tbody>
+                          <tr *ngFor="let item of editOrderModel.shopCart; let i=index">
+                            <td>
+                              {{item.name}}
+                            </td>
+                            <td>
+                              {{item.price | currency:'USD':true}}
+                            </td>
+                            <td>
+                              <input type="number" min="1" max="{{item.quantity}}" [(ngModel)]="editOrderModel.shopCart[i].bayQt" (change)="editOrderModel.recalcOrderSum()"
+                                name="qt{{i}}" />
+                            </td>
+                            <td>
+                              {{editOrderModel.shopCart[i].bayQt * item.price | currency:'USD':true}}
+                            </td>
+                            <td class="text-right">
+                              <button type="button" (click)="editOrderModel.moveToAvail(i);" class="btn btn-danger">Delete</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="4">
+                              <h4> Total: </h4>
+                            </td>
+                            <td class="text-right">
+                              <h4> {{editOrderModel.orderSum | currency:'USD':true}} </h4>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">Notes</label>
+                      <input [(ngModel)]="editOrderModel.notes" name="notes" type="text" class="form-control" placeholder="Notes">
+                    </div>
+                  </div>
+                </div>
+                <div id="e-ordr-pay" class="tab-pane fade in">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">Price paid/unpaid</label>
+                      <select [(ngModel)]="editOrderModel.paid" name="paid2" id="paid2" class="form-control" placeholder="Price paid/unpaid">
+                        <option value="paid">paid</option>
+                        <option value="unpaid">unpaid</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label" for="payMeth">Price methods</label>
+                      <select multiple name="method" id="payMeth" class="form-control" placeholder="Method">
+                        <option *ngFor="let method of priceMethods" value="{{method.value}}">{{method.value}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">Ticket Number</label>
+                      <input [(ngModel)]="editOrderModel.ticketNumber" name="ticketNumber" type="text" class="form-control" placeholder="Ticket Number">
+                    </div>
+                  </div>
+                </div>
+                <div id="e-ordr-status" class="tab-pane fade in">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">Status</label>
+                        <select [(ngModel)]="editOrderModel.status" name="status2" id="editOrderModel.status" class="form-control" placeholder="Status">
+                          <option value="pending">Pending</option>
+                          <option value="done">Done</option>
+                        </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--End tabs content-->
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <button *ngIf="!dsblCtrlBtns" type="button" (click)="onUpdate(updateOrderForm)" class="btn btn-success" [disabled]="invalidProducts || updateOrderForm.invalid">Save</button>
+                  <a *ngIf="dsblCtrlBtns" data-toggle="modal" href="#warning" class="btn btn-success" onclick="$('#edit-form').modal('toggle');"> Save </a>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End edit dialog-->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="ibox">
+        <div class="ibox-content">
+          <!--<div class="input-group">
+            <input type="text" [(ngModel)]="searchOrder" placeholder="Search order " class="input form-control">
+            <span class="input-group-btn">
+                  <button type="button" class="btn btn btn-primary"> <i class="fa fa-search"></i> Search</button>
+                  </span>
+          </div>-->
+          <table id="footable" class="table table-stripped toggle-arrow-tiny" 
+          data-paging-size="20"
+          data-sorting="true"
+          data-paging="true"
+          data-filtering="true"
+          data-filter-delay="10"
+          > 
+            <!--<table class="table table-stripped toggle-arrow-tiny">-->
+            <thead>
+              <tr>
+                <th data-type="number" data-sort-initial="true">Order ID</th>
+                <th>Created</th>
+                <th>Client name</th>
+                <th>Status</th>
+                <th>Paid/unpaid</th>
+                <th class="text-right" data-sort-ignore="true" data-type="html" >Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!--| likefilter:searchOrder-->
+              <tr *ngFor="let order of ordersTableSource" [ngClass]="{ 'selected-row' : order.orderId==selectedOrderId }">
+                <td data-type="number">
+                  {{+order.orderId}}
+                </td>
+                <td>
+                  {{ order.date | date }}
+                </td>
+                <td>
+                  {{order.clientName}}
+                </td>
+                <td>
+                  <span class="label" [ngClass]="{ 'label-primary' : order.statusClass, 'label-danger' : !order.statusClass }">{{order.status}}</span>
+                </td>
+                <td>
+                  {{order.paid}}
+                </td>
+                <td class="text-right">
+                  <!--<div class="btn-group">-->
+                    <a  class="btn btn-primary"  (click)="onRead(order.$key);">View order</a>
+                  <!--</div>-->
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="6">
+                  <ul class="pagination pull-right"></ul>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End page wrapper-->

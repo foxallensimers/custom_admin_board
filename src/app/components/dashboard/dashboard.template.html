@@ -1,0 +1,245 @@
+<div class="wrapper wrapper-content">
+  <!--stock alert-->
+  <div id="message" *ngFor="let prod of stockAlertProducts">
+    <div style="padding: 5px;">
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> The product "{{prod.name}}" ends. {{prod.quantity}}
+        more left.
+      </div>
+    </div>
+  </div>
+  <!--end stock alert-->
+  <div class="row">
+    <div class="col-lg-3">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <span class="label label-success pull-right">Monthly</span>
+          <h5>Income</h5>
+        </div>
+        <div class="ibox-content">
+          <h1 class="no-margins">{{income}}</h1>
+          <div class="stat-percent font-bold text-success">{{incomePercent}}% <i class="fa fa-bolt"></i></div>
+          <small>Total income</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <span class="label label-info pull-right">Monthly </span>
+          <h5>Orders</h5>
+        </div>
+        <div class="ibox-content">
+          <h1 class="no-margins">{{orders}}</h1>
+          <div class="stat-percent font-bold text-info">{{totalOrderPercent}}% <i class="fa fa-level-up"></i></div>
+          <small>New orders</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <span class="label label-primary pull-right">Monthly</span>
+          <h5>New clients</h5>
+        </div>
+        <div class="ibox-content">
+          <h1 class="no-margins">{{newClients}}</h1>
+          <div class="stat-percent font-bold text-navy">{{newClientsPercent}}<i class="fa fa-level-up"></i></div>
+          <small>New clients</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <span class="label label-danger pull-right">Daily</span>
+          <h5>Sales</h5>
+        </div>
+        <div class="ibox-content">
+          <h1 class="no-margins">{{dailySales}}</h1>
+          <div class="stat-percent font-bold text-danger">{{dailySalesPercent}}<i class="fa fa-level-down"></i></div>
+          <small>Daily</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Orders</h5>
+          <div class="pull-right">
+            <div class="btn-group">
+              <button (click)="daySort()" type="button" class="btn btn-xs btn-white">Today</button>
+              <button (click)="monthSort()" type="button" class="btn btn-xs btn-white active">Monthly</button>
+              <button (click)="yearsSort()" type="button" class="btn btn-xs btn-white">Annual</button>
+            </div>
+          </div>
+        </div>
+        <div class="ibox-content">
+          <div class="row">
+            <div class="col-lg-9">
+              <!--chart-->
+              <div *ngIf="flotDataset" class="flot-chart">
+                <div flotChart class="flot-chart-content" [options]="flotOptions" [dataset]="flotDataset"></div>
+              </div>
+              <!--end chart-->
+            </div>
+            <div class="col-lg-3">
+              <ul class="stat-list">
+                <li>
+                  <h2 class="no-margins">2,346</h2>
+                  <small>Total orders in period</small>
+                  <div class="stat-percent">48% <i class="fa fa-level-up text-navy"></i></div>
+                  <div class="progress progress-mini">
+                    <div style="width: 48%;" class="progress-bar"></div>
+                  </div>
+                </li>
+                <li>
+                  <h2 class="no-margins ">4,422</h2>
+                  <small>Orders in last month</small>
+                  <div class="stat-percent">60% <i class="fa fa-level-down text-navy"></i></div>
+                  <div class="progress progress-mini">
+                    <div style="width: 60%;" class="progress-bar"></div>
+                  </div>
+                </li>
+                <li>
+                  <h2 class="no-margins ">9,180</h2>
+                  <small>Monthly income from orders</small>
+                  <div class="stat-percent">22% <i class="fa fa-bolt text-navy"></i></div>
+                  <div class="progress progress-mini">
+                    <div style="width: 22%;" class="progress-bar"></div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Orders table</h5>
+          <iboxtools></iboxtools>
+        </div>
+        <div class="ibox-content">
+          <div class="row">
+            <div class="col-sm-9 m-b-xs">
+              <!--table slices-->
+              <!-- data-toggle="buttons" -->
+              <div class="btn-group">
+                <!--<label class="btn btn-sm btn-white"> <input type="radio" id="option1" name="options" (click)="offersFilter('day')"> Day </label>
+                <label class="btn btn-sm btn-white"> <input type="radio" id="option3" name="options" (click)="offersFilter('month')"> Month </label>
+                <label class="btn btn-sm btn-white active"> <input type="radio" id="option2" name="options" (click)="offersFilter('year')"> Year </label>-->
+                <button id="day" (click)="offersFilter('day');" type="button" class="btn btn-xs btn-white">Day</button>
+                <button id="mon" (click)="offersFilter('month');" type="button" class="btn btn-xs btn-white">Month</button>
+                <button id="yea" (click)="offersFilter('year');" type="button" class="btn btn-xs btn-white active">Year</button>
+              </div>
+              <!--class="form-control input-sm"-->
+              <select name="rowsPerPage" [(ngModel)]="rowsPerPage" (change)="onRowsPerPageChange()" >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+              </select>
+              <!--end table slices-->
+            </div>
+            <div class="col-sm-3">
+              <!--<input type="text" class="form-control input-sm m-b-xs" id="filter" placeholder="Search in table">-->
+              <!--<div class="input-group">
+                <input type="text" [(ngModel)]="searchOrder" placeholder="Search" class="input-sm form-control"> <span class="input-group-btn">
+              <button type="button" class="btn btn-sm btn-primary"> Go!</button> </span>
+              </div>-->
+            </div>
+          </div>
+          <div class="table-responsive">
+            <!--orders table-->
+                        <!--data-filtering="true" -->
+                        <!--footable-filtering-right-->
+            <table class="footable table table-stripped toggle-arrow-tiny " 
+            data-paging-size="20" 
+            data-sorting="true"
+            
+            data-filtering="true"
+            data-filter-delay="10"
+            filter="#filter"
+            data-paging="true">
+              <thead>
+                <tr>
+                  <th data-type="number" data-sort-initial="true">Order ID</th>
+                  <th>Created</th>
+                  <th>Client name</th>
+                  <th>Status</th>
+                  <th>Paid/unpaid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of ordersListForTable | likefilter:searchOrder">
+                  <td>
+                    {{order.orderId}}
+                  </td>
+                  <td>
+                    {{ order.date | date }}
+                  </td>
+                  <td>
+                    {{order.clientName}}
+                  </td>
+                  <td>
+                    <span class="label" [ngClass]="{ 'label-primary' : order.statusClass, 'label-danger' : !order.statusClass }">{{order.status}}</span>
+                  </td>
+                  <td>
+                    {{order.paid}}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="6">
+                    <ul class="pagination pull-right"></ul>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+            <!--end orders table-->
+
+            <!--chat-->
+            <div class="small-chat-box ng-small-chat fadeInRight animated" *ngIf="openChat" style="z-index:100">
+              <div class="heading" draggable="true">
+                <small class="chat-date pull-right"></small> Chat with admin
+              </div>
+              <div class="content" chat-slim-scroll style="max-height:234px;overflow-x:hidden;">
+                <div *ngFor="let m of messages" [ngClass]="m.author===selfName ? 'right' : 'left'" (show)="onMessShow(m.text)">
+                  <div class="author-name">{{m.author === 'self' ? '' : m.author }}
+                    <small class="chat-date"> {{m.date | date:'short'}} </small>
+                  </div>
+                  <div class="chat-message" [class.active]="m.author !== selfName">
+                    {{m.text}}
+                  </div>
+                </div>
+              </div>
+              <div class="form-chat">
+                <div class="input-group input-group-sm">
+                  <input type="text" [(ngModel)]="chatmessage" placeholder="Message" class="input-sm form-control" (keyup.enter)="onSendChatMess(chatmessage);chatmessage=''">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" (click)="onSendChatMess(chatmessage);chatmessage=''">Send</button> 
+                  </span></div>
+              </div>
+            </div>
+            <!-- openChat = !openChat -->
+            <div id="small-chat" (click)="onChatToggle(chatMessage);">
+              <span class="badge badge-warning pull-right">{{newMessagesNum}}</span>
+              <a class="open-small-chat">
+                <i class="fa fa-comments"></i>
+              </a>
+            </div>
+            <!--end chat-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+  <div class="col-lg-10">
+    <h2>Payment Page</h2>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#/dashboards/main-view">Home</a>
+      </li>
+      <li class="active">
+        <strong>Payment Page</strong>
+      </li>
+    </ol>
+  </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight ecommerce">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="tabs-container">
+        <div class="tab-content">
+          <div id="tab-2" class="tab-pane active">
+            <div class="panel-body">
+              <form>
+                <fieldset class="form-horizontal">
+                  <div class="row">
+                    <!--<div class="col-md-4">-->
+                      <div class="form-group">
+                        <div *ngIf="seccessSave" class="alert alert-success">
+                          Saved
+                        </div>
+                      </div>
+                    <!--</div>-->
+                    <!--<div class="col-md-4">-->
+                      <div class="form-group">
+                        <div *ngIf="errorSave" class="alert alert-danger">
+                          {{errorMessage}}
+                        </div>
+                      </div>
+                    <!--</div>-->
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <div *ngFor="let option of options; let i = index">
+                          <input type="checkbox" name="options{{i}}" value="{{option}}" [checked]="optionsMap[option]" 
+                          (change)="updateCheckedOptions(option, $event)"><label> {{option}}</label>
+                        </div>
+                        <!--<div>
+                          <input  name="othercheck" type="checkbox" id="checkbox5"  value="other" [(ngModel)]="otherSwitch">
+                          <label> Other </label>
+                        </div>-->
+                        <div class="col-sm-12">
+                          <div class="input-group">
+                            <!--*ngIf="otherSwitch"-->
+                            <input type="text" [(ngModel)]="otherPriceMethod"  name="othertext" class="form-control">
+                             <span class="input-group-btn">
+                                <button type="button" class="btn btn-primary" (click)="onAddOtherClick()">Add</button>
+                             </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <button type="button" (click)="onSave()" class="btn btn-success">Save</button>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

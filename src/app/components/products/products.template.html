@@ -1,0 +1,220 @@
+<div id="warning" class="modal fade" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Warning</h4>
+      </div>
+      <div class="modal-body">
+        You use the trial version. For activation this function You have to subscribe.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary"  href="#/preferences/subscription" onclick="$('#warning').modal('toggle');">Go to subscription</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Main view/routes wrapper-->
+<div class="row wrapper border-bottom white-bg page-heading">
+  <div class="col-lg-10">
+    <h2>Product list</h2>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#/dashboards/main-view">Home</a>
+      </li>
+      <li class="active">
+        <strong>Products list</strong>
+      </li>
+    </ol>
+  </div>
+  <div class="col-lg-2">
+    <div class="text-center" style="float: right;margin-top: 30px;">
+      <a data-toggle="modal" class="btn btn-primary" [href]="dsblCtrlBtns?'#warning':'#create-form'" (click)="myForm.resetForm();">Create product</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight ecommerce">
+  <!--create dialog-->
+  <div id="create-form" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">{{isEditMode ? 'Edit' : 'Create'}} {{createModel.isService ? 'Service' : 'Product'}}</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <form class="form-edit" #myForm="ngForm" novalidate>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <ui-switch name="isservice" [(ngModel)]="createModel.isService" color="#18a689"></ui-switch>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <!--input name block-->
+                    <label class="control-label" for="product_name">Name</label>
+                    <input type="text" id="product_name" class="form-control" placeholder="Name" required required minlength="4" maxlength="24"
+                      name="name" [(ngModel)]="createModel.name" #pname="ngModel">
+                    <!--pattern="^[a-zA-Z0-9]+$"-->
+                    <!--end input name block-->
+                    <!--validation name block-->
+                    <div *ngIf="pname.errors && (pname.dirty || pname.touched)" class="alert alert-danger">
+                      <div [hidden]="!pname.errors.required">
+                        Name is required
+                      </div>
+                      <div [hidden]="!pname.errors.minlength">
+                        Name must be at least 4 characters long.
+                      </div>
+                      <div [hidden]="!pname.errors.maxlength">
+                        Name cannot be more than 24 characters long.
+                      </div>
+                      <!--<div [hidden]="!pname.errors.pattern">
+                        Name must contain leters and numbers only.
+                      </div>-->
+                    </div>
+                    <!--end validation namr block-->
+
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label class="control-label" for="price">Price</label>
+                    <input type="text" id="price" required pattern="[0-9]{1,4}" [(ngModel)]="createModel.price" name="price" value="" placeholder="Price"
+                      class="form-control" required minlength="1" maxlength="4" #price="ngModel">
+                    <div *ngIf="price.errors && (price.dirty || price.touched)" class="alert alert-danger">
+                      <div [hidden]="!price.errors.required">
+                        Price is required
+                      </div>
+                      <div [hidden]="!price.errors.pattern">
+                        Price must be a number
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="!createModel.isService" class="col-sm-12">
+                  <div class="form-group">
+                    <label class="control-label" for="quantity">Quantity</label>
+                    <input type="text" id="quantity" [(ngModel)]="createModel.quantity" #pquantity="ngModel" name="quantity" value="" placeholder="Quantity"
+                      class="form-control" required pattern="[0-9]{1,4}" minlength="1" maxlength="4">
+                    <div *ngIf="pquantity.errors && (pquantity.dirty || pquantity.touched)" class="alert alert-danger">
+                      <div [hidden]="!pquantity.errors.required">
+                        Quantity is required
+                      </div>
+                      <div [hidden]="!pquantity.errors.pattern">
+                        Quantity must be number
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="!createModel.isService" class="col-sm-12">
+                  <div class="form-group">
+                    <label class="control-label" for="quantity">Stock alert</label>
+                    <input class="form-control" type="number" name="stock-alert" [(ngModel)]="createModel.stockAlert"/>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label class="control-label" >Category</label>
+                    <div class="input-group">
+                      <input type="text" name="add-cat" list="cat-names" [(ngModel)]="createModel.category" class="form-control">
+                      <datalist id="cat-names">
+                        <option *ngFor="let cat of catList" value="{{cat}}">
+                      </datalist>
+                      <div class="input-group-btn">
+                      <button class="btn btn-primary" type="button" (click)="addCategory()">
+                        <i class="fa fa-plus"></i>
+                      </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <label class="control-label" >Tags</label>
+                  <div class="form-group">
+                    <input id="tags" type="text" name="tags"  class="form-control" data-role="tagsinput" placeholder="Enter tags" />
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <button *ngIf="!dsblCtrlBtns" type="submit" class="btn btn-success" [disabled]="myForm.invalid" (click)="onCreate(myForm)">Save</button>
+                    <a *ngIf="dsblCtrlBtns" data-toggle="modal" href="#warning" class="btn btn-success" onclick="$('#create-form').modal('toggle');"> Save </a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--end create dialog-->
+  <!--edit dialog-->
+
+  <!--end edit dialog-->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="ibox">
+        <div class="ibox-content">
+                      <!--[(ngModel)]="searchProduct"-->
+          <!--<div class="input-group" >
+
+            <input type="text"  placeholder="Search product " class="input form-control" id="filter">
+            <span class="input-group-btn">
+                    <button type="button" class="btn btn btn-primary"> <i class="fa fa-search"></i> Search</button>
+            </span>
+          </div>-->
+          <!--data-filtering="true" -->
+          <table class="footable table table-stripped toggle-arrow-tiny" 
+          data-paging-size="20"
+          data-sorting="true"
+          data-paging="true"
+          data-filtering="true"
+          data-filter-delay="10"
+          >
+            <thead>
+              <tr>
+                <th >Name</th>
+                <th data-type="number" data-sort-initial="true">Price</th>
+                <th data-type="number">Quantity</th>
+                <th>Category</th>
+                <th class="text-right" data-sort-ignore="true" data-type="html">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of productsTable;let i=index">
+                <td>
+                  {{product.name}}
+                </td>
+                <td>
+                  {{product?.price}}
+                </td>
+                <td>
+                  {{product?.quantity}}
+                </td>
+                <td>
+                  {{product?.category}}
+                </td>
+                <td class="text-right">
+                  <div class="btn-group">
+                    <a data-toggle="modal" class="btn btn-primary" (click)="onGet(product.$key)" href="#create-form">View product</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="6">
+                  <ul class="pagination pull-right"></ul>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End page wrapper-->
